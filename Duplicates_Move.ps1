@@ -102,10 +102,14 @@ if($OutputArrayMCNodeDetailMesh){
 			    Write-Log -Component $Component -LogText "Moving Device: $($_.MCDeviceName) ($( $_.MCDeviceID)) from group: $($_.MCDeviceGroupName) ($($_.MCDeviceGroupID)) to: $($deviceGroup.GroupName) ($($deviceGroup.GroupID))"
 			
 			    Set-MeshCentralData -action changeDeviceMesh -requestData @{nodeids=@($_.MCDeviceID); meshid=$deviceGroup.GroupID }
+
+				# Write-Host "Remove $($_.DeviceName) with ID: $($_.DeviceId)"
+				# Remove-MeshCentralData -action removedevices -requestData @{nodeids=@($_.DeviceId) }
 		    }
         }
 
     }
 }
+
 
 #Remove-Module MeshCentralModule
