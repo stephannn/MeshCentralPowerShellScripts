@@ -1,0 +1,6 @@
+<config>
+	<username>TomPetty</username>
+	<password>heartbreakers</password>
+	<meshServer>localhost:443</meshServer>
+	<serverProtocol>wss</serverProtocol>
+</config>
