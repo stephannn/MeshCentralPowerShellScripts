@@ -16,7 +16,7 @@ function Remove-MeshCentralData {
     $errorVar = $null
     try {
         $ws.ConnectAsync($uri, $ct).Wait()
-        Write-Host "Connected!"
+        #Write-Host "Connected!"
     }
     catch {
         Write-Host "Error:" $_.Exception.InnerException.Message
