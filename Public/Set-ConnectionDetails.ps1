@@ -14,6 +14,17 @@ public static class Dummy {
         return new RemoteCertificateValidationCallback(Dummy.ReturnTrue);
     }
 }
+
+public class CertCallback {
+    public static bool Validate(
+        object sender,
+        X509Certificate cert,
+        X509Chain chain,
+        SslPolicyErrors errors)
+    {
+        return true;
+    }
+}
 "@
 
 function Set-ConnectionDetails {

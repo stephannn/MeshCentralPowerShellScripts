@@ -12,6 +12,13 @@ function Remove-MeshCentralData {
     # Add authentication header
     $ws.Options.SetRequestHeader("x-meshauth", $global:authHeader)
 
+    # Trust all certs
+    if([bool]($PSVersionTable.PSVersion.Major -ge 7)){
+        $ws.Options.RemoteCertificateValidationCallback = [System.Net.Security.RemoteCertificateValidationCallback] [CertCallback]::Validate
+    } else {
+        [System.Net.ServicePointManager]::ServerCertificateValidationCallback = [dummy]::GetDelegate()
+	}
+
     $uri = [System.Uri]$global:serverUrl
     $errorVar = $null
     try {
