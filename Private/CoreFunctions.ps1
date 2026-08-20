@@ -5,12 +5,11 @@ Function Convert-FromUnixDate ($UnixDate) {
     return $null
 }
 
-function Write-Log
-{
+function Write-Log{
     Param(
         [Parameter(
-            Mandatory = $true,
-            ValueFromPipeline = $true)]
+        Mandatory = $true,
+        ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [string]$LogText,
 
@@ -50,6 +49,10 @@ function Write-Log
             Write-Error -Message 'Variable $LogFilePath not defined in scope $Global:'
             exit 1
         }
+		
+		if (-not (Test-Path -Path (Split-Path $Global:LogFilePath -Parent) -PathType Container)) {
+            New-Item -ItemType Directory -Force -Path (Split-Path $Global:LogFilePath -Parent) | Out-Null
+        }
         
         if (-not (Test-Path -Path $Global:LogFilePath -PathType Leaf)) {
             New-Item -Path $Global:LogFilePath -ItemType File -ErrorAction Stop | Out-Null
@@ -74,12 +77,14 @@ function Write-Log
         $Bias = ($now.ToUniversalTime() - $now).TotalMinutes
         [string]$Line = "<![LOG[{0}]LOG]!><time=`"{1:HH:mm:ss.fff}{2}`" date=`"{1:MM-dd-yyyy}`" component=`"{3}`" context=`"`" type=`"{4}`" thread=`"{5}`" file=`"{6}`">" -f $LogText, $now, $Bias, $Component, $TypeNum, $Thread, $File
         $Line | Out-File -FilePath $Global:LogFilePath -Encoding utf8 -Append -ErrorAction Stop
+        #Write-Host $LogText
     }
     
     End
     {
     }
 }
+
 
 function Receive-WebSocketMessage {
     param(
@@ -148,7 +153,18 @@ function Switch-Action {
         'getDeviceDetails' {
             #Write-Verbose $json.data
             foreach ($detail in ($json.data | ConvertFrom-CSV)){
-                $nodesDetailResult += [pscustomobject][ordered]@{DeviceId = ($detail.id -split '/')[2]; DeviceName = $($detail.name); SerialNumber = $detail.biosSerial ;OS = $detail.osdesc; LastConnectTime = (Convert-FromUnixDate $detail.lastConnectTime)}
+                #$nodesDetailResult += [pscustomobject][ordered]@{DeviceId = ($detail.id -split '/')[2]; DeviceName = $($detail.name); SerialNumber = $detail.biosSerial ;OS = $detail.osdesc; LastConnectTime = (Convert-FromUnixDate $detail.lastConnectTime)}
+                $nodesDetailResult += [pscustomobject][ordered]@{
+                    DeviceId       = ($detail.id -split '/')[2]
+                    DeviceName     = $detail.name
+                    SerialNumber   = if ($detail.biosSerial) {
+                                        $detail.biosSerial
+                                    } else {
+                                        $detail.boardSerial
+                                    }
+                    OS             = $detail.osdesc
+                    LastConnectTime = Convert-FromUnixDate $detail.lastConnectTime
+                }
             }
         }
         'changeDeviceMesh'{
