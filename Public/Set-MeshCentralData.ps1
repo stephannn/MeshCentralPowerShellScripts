@@ -1,7 +1,7 @@
 function Set-MeshCentralData {
 	[CmdletBinding(SupportsShouldProcess = $true)]
     param(
-        [ValidateSet( 'changeDeviceMesh')]
+        [ValidateSet( 'changeDeviceMesh', 'changeDevice')]
         [string]$action,
         [hashtable]$requestData
     )
@@ -63,6 +63,8 @@ function Set-MeshCentralData {
 					$ws.CloseAsync(
 						[System.Net.WebSockets.WebSocketCloseStatus]::NormalClosure, "", [System.Threading.CancellationToken]::None
 					).Wait()
+					
+					if($json.result -eq "Access Denied"){ return $false }
 
 					return $result
 				}

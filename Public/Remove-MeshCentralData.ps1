@@ -50,7 +50,7 @@ function Remove-MeshCentralData {
             $json = $null
             try { $json = $response | ConvertFrom-Json } catch {}
 
-            if ($json -eq $null) { continue }
+            if ($null -eq $json) { continue }
 
             # your switch block remains unchanged
             $result = Switch-Action -json $json
