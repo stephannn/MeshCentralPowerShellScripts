@@ -155,20 +155,24 @@ function Switch-Action {
             foreach ($detail in ($json.data | ConvertFrom-CSV)){
                 #$nodesDetailResult += [pscustomobject][ordered]@{DeviceId = ($detail.id -split '/')[2]; DeviceName = $($detail.name); SerialNumber = $detail.biosSerial ;OS = $detail.osdesc; LastConnectTime = (Convert-FromUnixDate $detail.lastConnectTime)}
                 $nodesDetailResult += [pscustomobject][ordered]@{
-                    DeviceId       = ($detail.id -split '/')[2]
-                    DeviceName     = $detail.name
-                    SerialNumber   = if ($detail.biosSerial) {
+                    DeviceId        = ($detail.id -split '/')[2]
+                    DeviceName      = $detail.rname
+                    SerialNumber    = if ($detail.biosSerial) {
                                         $detail.biosSerial
                                     } else {
                                         $detail.boardSerial
                                     }
-                    OS             = $detail.osdesc
+					MeshName        = $detail.name
+                    OS              = $detail.osdesc
                     LastConnectTime = Convert-FromUnixDate $detail.lastConnectTime
                 }
             }
         }
         'changeDeviceMesh'{
             $changeDeviceMesh = @($true, "Device moved")
+        }
+		'changeDevice'{
+            $changeDevice = @($true, "Device changed")
         }
         'removedevices'{
             $removeDeviceMesh = @($true, "Device removed")
@@ -186,6 +190,7 @@ function Switch-Action {
     if($nodesResult.Length -gt 0) { return $nodesResult }
     if($nodesDetailResult.Length -gt 0) { return $nodesDetailResult }
     if($null -ne $changeDeviceMesh) { return $changeDeviceMesh }
+	if($null -ne $changeDevice) { return $changeDevice }
     if($null -ne $removeDeviceMesh) { return $removeDeviceMesh }
 
     return $null
